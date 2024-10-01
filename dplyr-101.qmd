@@ -27,8 +27,12 @@ white_wine <- read.csv("~/Documents/QE_dauphine_m1/data_management/R/git-101-202
 |  Number of observations   |  `r NROW(white_wine)`   |
 |  Number of variables   |  `r NCOL(white_wine)`   |
 
+
+This piece of code does not work due to `quality` being a numeric variable which does not allow for filling
 ```{r}
-ggplot(white_wine, aes(x = quality))+
+#| eval: false
+#| code-fold: false
+ggplot(white_wine, aes(x = quality, fill = quality))+
   geom_bar()
 ```
 
@@ -52,3 +56,19 @@ class(pull(white_wine, quality))
 ```
 
 With `dplyr`, `pull()` is the column extraction function, somewhat similiar to the dollar `$` operation and to the the double bracket `[[]]`.
+
+### Column recoding
+```{r}
+#| eval: false
+
+white_wine$quality <- factor(white_wine$quality, ordered = T, levels = 3:9)
+white_wine$quality <- white_wine$quality |> factor(ordered = T, levels = 3:9)
+```
+
+```{r}
+white_wine <- white_wine |> mutate(quality = factor(quality,ordered = T, levels = 3:9))
+
+ggplot(white_wine, aes(x = quality, fill = quality))+
+  geom_bar()
+```
+
