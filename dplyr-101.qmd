@@ -12,7 +12,6 @@ library(vroom)
 library(here)
 library(ggplot2)
 library(readr)
-library(dplyr)
 ```
 ## Data import
 
@@ -70,5 +69,96 @@ white_wine <- white_wine |> mutate(quality = factor(quality,ordered = T, levels 
 
 ggplot(white_wine, aes(x = quality, fill = quality))+
   geom_bar()
+```
+### Computing new columns 
+
+this is a task for `mutate()`
+```{r}
+white_wine <- white_wine |> mutate(captured_sulfur_dioxide = `total.sulfur.dioxide` - `free.sulfur.dioxide`,
+                                 free_sd_pc = round(`free.sulfur.dioxide` / `total.sulfur.dioxide` * 100,2))
+```
+
+## Subsetting 
+
+### Selecting columns 
+
+Side note: we can nicely display data frames with the `knitr::kable()` function but the original data frame is too big, so we select only the 10 first rows
+
+```{r}
+  white_wine |> select(fixed.acidity, volatile.acidity, citric.acid, pH) |>
+  slice(1:10) |>
+  knitr::kable()
+```
+
+```{r}
+white_wine |> select(contains("acid")) |>
+  slice(1:10) |>
+  knitr::kable()
+```
+
+```{r}
+white_wine |> select(where(is.factor)) |>
+  slice(1:10) |>
+  knitr::kable()
+```
+
+```{r}
+white_wine |> select(where(\(x) is.numeric(x) & (max(x)<5))) |>
+  slice(1:10) |>
+  knitr::kable()
+```
+
+### Selecting rows
+
+Simple selection is based on indices with `slice()`
+
+```{r}
+white_wine |> slice(1:5,150:155) |>
+  select(alcohol, quality) |>
+  knitr::kable()
+```
+
+Condition based selection uses `filter()`
+```{r}
+white_wine |> filter(alcohol > 14) |>
+  select(alcohol, quality, citric.acid, residual.sugar) |>
+  slice(1:10) |>
+  knitr::kable()
+```
+
+### Simple application 
+```{r}
+ggplot(white_wine, aes(x=alcohol))+
+  geom_density(bw = "sj")+
+  geom_rug(alpha = 0.1)
+```
+
+```{r}
+white_wine |>
+  filter(alcohol > 13 , citric.acid < 1) |>
+  ggplot(aes(x=citric.acid, y=residual.sugar, color = alcohol)) +
+  geom_point() +
+  scale_color_viridis_c()
+```
+
+```{r}
+white_wine |>
+  filter(alcohol <= 9) |>
+  ggplot(aes(x=citric.acid, y=residual.sugar, color = alcohol)) +
+  geom_point() +
+  scale_color_viridis_c()
+```
+
+
+```{r}
+white_wine |> mutate(alcohol_category = case_when(alcohol <= 9 ~ "low", 
+                                                  alcohol > 13 ~ "high",
+                                                  .default = "medium")) |>
+  filter(alcohol_category != "medium", citric.acid <= 1)|>
+  ggplot(aes(x=citric.acid, y=residual.sugar, color = alcohol)) +
+  geom_point() +
+  scale_color_viridis_c() +
+  facet_wrap(vars(alcohol_category))
+
 ```
 
