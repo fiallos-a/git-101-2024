@@ -1,0 +1,54 @@
+---
+title: "dplyr-101"
+author: "Andres Fiallos"
+format: html
+---
+
+
+```{r}
+#| message: false
+here::i_am("git-101-2024.Rproj")
+library(vroom)
+library(here)
+library(ggplot2)
+library(readr)
+library(dplyr)
+```
+## Data import
+
+```{r}
+white_wine <- read.csv("~/Documents/QE_dauphine_m1/data_management/R/git-101-2024/white_wine.csv", sep=";")
+```
+
+
+
+|     |     |
+|-----|-----|
+|  Number of observations   |  `r NROW(white_wine)`   |
+|  Number of variables   |  `r NCOL(white_wine)`   |
+
+```{r}
+ggplot(white_wine, aes(x = quality))+
+  geom_bar()
+```
+
+
+
+## Data transformation
+
+```{r}
+#| message: false
+library(dplyr)
+
+
+```
+
+### Column extraction
+
+```{r}
+class(white_wine)
+
+class(pull(white_wine, quality))
+```
+
+With `dplyr`, `pull()` is the column extraction function, somewhat similiar to the dollar `$` operation and to the the double bracket `[[]]`.
